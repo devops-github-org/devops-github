@@ -1,0 +1,50 @@
+#Author: Bhargav
+---
+- name: Play to Download Java,install Tomcat and start the Tomcat service
+  hosts: all
+  become: true
+  gather_facts: no
+  tasks:
+  - name: Download Apache
+    get_url:
+      url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.64/bin/apache-tomcat-9.0.64.tar.gz
+      dest: /opt
+  - name: Download Java
+    get_url:
+      url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+      dest: /opt/jdk-8u131-linux-x64.rpm
+      headers:
+        Cookie: 'oraclelicense=accept-securebackup-cookie'
+  - name: Install Java
+    command: yum localinstall jdk-8u131-linux-x64.rpm -y
+    args:
+      chdir: /opt
+  - name: Unzip Apache file
+    unarchive:
+      src: /opt/apache-tomcat-9.0.64.tar.gz
+      dest: /opt
+      remote_src: yes
+  - name: Creating tomcat user
+    user:
+      name: tomcat
+      system: yes
+      shell: /sbin/nologin
+
+  - name: Changing the mode for Apache shell scripts
+    shell: chmod u+x *.sh
+    args:
+      chdir: /opt/apache-tomcat-9.0.64/bin
+  - name: Assigning the recersive ownership of Tomcat application directory to tomcat user
+    shell: chown -R tomcat:tomcat /opt/apache-tomcat-9.0.64
+  - name: creating the sym links for the Apache application starting script
+    file:
+      src: /opt/apache-tomcat-9.0.64/bin/startup.sh
+      dest: /usr/bin/startTomcat
+      state: link
+  - name: creating the sym links for the Apache application shutdown script
+    file:
+      src: /opt/apache-tomcat-9.0.64/bin/shutdown.sh
+      dest: /usr/bin/stopTomcat
+      state: link
+  - name:
+    shell: nohup /opt/apache-tomcat-9.0.64/bin/startup.sh
