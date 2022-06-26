@@ -46,5 +46,5 @@
       src: /opt/apache-tomcat-9.0.64/bin/shutdown.sh
       dest: /usr/bin/stopTomcat
       state: link
-  - name:
+  - name: To start the Tomact service
     shell: nohup /opt/apache-tomcat-9.0.64/bin/startup.sh
