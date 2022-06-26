@@ -15,7 +15,7 @@
       regexp: '^Listen'
       line: Listen {{ ports }}
     notify: reload apache
-  - name: To pring the message
+  - name: To print the message about the updated apache port number
     debug:
       msg: "Apache service is now listeing on port {{ ports }}"
   handlers:
