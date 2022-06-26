@@ -1,0 +1,26 @@
+---
+- name: Play to install HTTPD package on RHEL servers
+  become: true
+  hosts : all
+  gather_facts: no
+  vars:
+    ports: 8088
+    path: /etc/httpd/conf/httpd.conf
+  tasks:
+  - name: To Install HTTPD package on RHEL servers
+    shell: yum install httpd -y
+  - name: To update the http ports on RHEL servers
+    lineinfile:
+      path: "{{ path}}"
+      regexp: '^Listen'
+      line: Listen {{ ports }}
+    notify: reload apache
+  - name: To pring the message
+    debug:
+      msg: "Apache service is now listeing on port {{ ports }}"
+  handlers:
+    - name: reload apache
+      service:
+        name: httpd
+        state: reloaded
+        enabled: yes
